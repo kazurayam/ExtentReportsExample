@@ -10,11 +10,10 @@ import org.testng.ITestResult;
 import utils.extentreports.ExtentManager;
 import utils.logs.Log;
 
-import java.util.Objects;
-
 import static utils.extentreports.ExtentTestManager.getTest;
 
 public class TestListener implements ITestListener {
+
     private static String getTestMethodName(ITestResult iTestResult) {
         return iTestResult.getMethod().getConstructorOrMethod().getName();
     }
@@ -40,33 +39,45 @@ public class TestListener implements ITestListener {
     public void onTestSuccess(ITestResult iTestResult) {
         Log.info(getTestMethodName(iTestResult) + " test is succeed.");
         //ExtentReports log operation for passed tests.
-        getTest().log(Status.PASS, "Test passed");
+        //getTest().log(Status.PASS, "Test passed");
     }
 
     @Override
     public void onTestFailure(ITestResult iTestResult) {
         Log.info(getTestMethodName(iTestResult) + " test is failed.");
-
+/*
         //Get an instance of WebDriver out of the ITestResult
-        if (iTestResult.getTestContext().getAttribute("WebDriver") != null) {
-            WebDriver driver =
-                    (WebDriver) iTestResult.getTestContext()
-                            .getAttribute("WebDriver");
+        WebDriver driver = findWebDriver(iTestResult);
 
-            //Take base64Screenshot screenshot for extent reports
-            String base64Screenshot =
-                    "data:image/png;base64," +
-                            ((TakesScreenshot) Objects.requireNonNull(driver))
-                            .getScreenshotAs(OutputType.BASE64);
+        //Take base64Screenshot screenshot for extent reports
+        String base64Screenshot = "data:image/png;base64," +
+                ((TakesScreenshot)driver).getScreenshotAs(OutputType.BASE64);
 
-            //ExtentReports log and screenshot operations for failed tests.
-            getTest().log(Status.FAIL, "Test Failed",
-                    getTest().addScreenCaptureFromBase64String(base64Screenshot)
-                            .getModel().getMedia().get(0));
+        //ExtentReports log and screenshot operations for failed tests.
+        getTest().log(Status.FAIL, "Test Failed",
+                getTest().addScreenCaptureFromBase64String(base64Screenshot)
+                        .getModel().getMedia().get(0));
+
+ */
+    }
+
+    /**
+     * Return a WebDriver instance by calling
+     * result.getTestContext().getAttribute("WebDriver").
+     * The Test classes are supposed to set the WebDriver when it created it.
+     * If not found, will throw an RuntimeException.
+     *
+     * @param result
+     * @return instance of org.openqa.selenium.WebDriver
+     */
+    protected static WebDriver findWebDriver(ITestResult result) {
+        //Get an instance of WebDriver out of the ITestResult
+        if (result.getTestContext().getAttribute("WebDriver") != null) {
+            return (WebDriver) result.getTestContext().getAttribute("WebDriver");
         } else {
             throw new RuntimeException(
                     "Unable to get a WebDriver instance out of the ITestResult. " +
-                    " Your Test class is supposed to set it by calling " +
+                            " Your Test class is supposed to set it by calling " +
                             "ITestContext.addAttribute(\"WebDriver\", driver)");
         }
     }
