@@ -1,5 +1,8 @@
 package tests;
 
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
@@ -8,9 +11,13 @@ import static utils.extentreports.ExtentTestManager.startTest;
 
 public class LoginTests extends BaseTest {
     @Test(priority = 0, description = "Invalid Login Scenario with wrong username and password.")
-    public void invalidLoginTest_InvalidUserNameInvalidPassword(Method method) {
+    public void invalidLoginTest_InvalidUserNameInvalidPassword() {
+        // quoted from https://github.com/testng-team/testng/issues/1649
+        ITestResult result = Reporter.getCurrentTestResult();
+        Method method = result.getMethod().getConstructorOrMethod().getMethod();
+        String methodName = method.getName();
         //ExtentReports Description
-        startTest(method.getName(), "Invalid Login Scenario with invalid username and password.");
+        startTest(methodName, "Invalid Login Scenario with invalid username and password.");
 
         homePage
                 .goToN11()
